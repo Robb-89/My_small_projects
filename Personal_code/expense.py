@@ -43,26 +43,6 @@ def expense(amount, category, date=None):
     current_balance = get_balance()
     set_balance(current_balance - amount)
 
-# === Category Management ===
-class Category:
-    def __init__(self):
-        self.categories = []
-
-    def add_category(self, category):
-        if category not in self.categories:
-            self.categories.append(category)
-        else:
-            raise ValueError("Category already exists.")
-
-    def remove_category(self, category):
-        if category in self.categories:
-            self.categories.remove(category)
-        else:
-            raise ValueError("Category does not exist.")
-
-    def get_categories(self):
-        return self.categories
-
 # === Debt Management ===
 def add_debt(name, amount, reason, date=None):
     if date is None:
@@ -140,8 +120,9 @@ def make_debt_payment(name, payment_amount):
         writer.writerows(updated_rows)
     print("[✓] Payment logged.")
 
+# === Main CLI Interface ===
 def main():
-    print("\nWelcome to Robert's Expense Tracker!")
+    print("\nWelcome to the Personal Expense Tracker!")
 
     while True:
         print("\nChoose an option:")
@@ -157,39 +138,78 @@ def main():
         choice = input("Enter choice: ")
 
         if choice == '1':
+            print("Type 'exit' to cancel.")
             name = input("Debt name: ")
+            if name.lower() == 'exit': continue
             amount = input("Amount owed: ")
+            if amount.lower() == 'exit': continue
             description = input("Description: ")
+            if description.lower() == 'exit': continue
             due_date = input("Due date (YYYY-MM-DD): ")
-            add_personal_debt(name, amount, description, due_date)
+            if due_date.lower() == 'exit': continue
+
+            try:
+                add_personal_debt(name, amount, description, due_date)
+            except ValueError as e:
+                print(f"[!] Error: {e}")
 
         elif choice == '2':
             view_personal_debts()
 
         elif choice == '3':
+            print("Type 'exit' to cancel.")
             name = input("Debt name: ")
+            if name.lower() == 'exit': continue
             payment = input("Payment amount: ")
-            make_debt_payment(name, payment)
+            if payment.lower() == 'exit': continue
+            try:
+                make_debt_payment(name, payment)
+            except ValueError:
+                print("[!] Invalid amount.")
 
         elif choice == '4':
+            print("Type 'exit' to cancel.")
             name = input("Who do you owe or who owes you? ")
+            if name.lower() == 'exit': continue
             amount = input("Amount: ")
+            if amount.lower() == 'exit': continue
             reason = input("Reason: ")
+            if reason.lower() == 'exit': continue
             date = input("Date (YYYY-MM-DD): ")
-            add_debt(name, amount, reason, date)
+            if date.lower() == 'exit': continue
+
+            try:
+                add_debt(name, amount, reason, date)
+            except ValueError as e:
+                print(f"[!] Error: {e}")
 
         elif choice == '5':
             view_debts()
 
         elif choice == '6':
+            print("Type 'exit' to cancel.")
             category = input("Category: ")
+            if category.lower() == 'exit': continue
             amount = input("Amount: ")
+            if amount.lower() == 'exit': continue
             date = input("Date (YYYY-MM-DD) [leave blank for today]: ")
-            expense(amount, category, date if date else None)
+            if date.lower() == 'exit': continue
+
+            try:
+                expense(amount, category, date if date else None)
+            except ValueError as e:
+                print(f"[!] Error: {e}")
 
         elif choice == '7':
+            print("Type 'exit' to cancel.")
             amount = input("Amount to add to balance: ")
-            add_funds(amount)
+            if amount.lower() == 'exit': continue
+
+            try:
+                add_funds(amount)
+                print("[✓] Funds added.")
+            except ValueError as e:
+                print(f"[!] Error: {e}")
 
         elif choice == '8':
             print("Goodbye!")
